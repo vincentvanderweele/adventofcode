@@ -21,14 +21,6 @@ t = data.filter((x, i) =>
 
 // problem 2
 i=0, j=0, s=0
-while(s !== t) {
-  if (s < t) { 
-    s+=data[j];
-    j++
-  } else {
-    s-=data[i];
-    i++;
-  }
-}
+while(s !== t) s+=s<t?data[j++]:-data[i++]
 r=data.slice(i, j).sort((a, b) => a-b)
 r[0]+r[r.length-1]
