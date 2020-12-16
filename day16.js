@@ -30,24 +30,22 @@ ranges = data[0]
     }
   })
 
-validTickets = tickets
+validTickets = data[2]
+  .split('\n')
+  .slice(1)
+  .filter(x => x)
+  .map(x => x.split(',').map(y => parseInt(y)))
   .filter(ticket => 
-    ticket
-      .map(t =>
-        ranges
-          .filter(r => (r.r[0][0] <= t && t <= r.r[0][1]) || (r.r[1][0] <= t && t <= r.r[1][1]))
-          .map(x => x.k))
-      .every(x => x.length))
+    ticket.every(t => ranges.some(r => (r.r[0][0] <= t && t <= r.r[0][1]) || (r.r[1][0] <= t && t <= r.r[1][1]))))
 
-options = validTickets[0].map(_ => new Set(ranges.map(x => x.k)))
-for (i=0; i<validTickets.length; i++) {
-    options = validTickets[i]
-      .map(t =>
-        ranges
-          .filter(r => (r.r[0][0] <= t && t <= r.r[0][1]) || (r.r[1][0] <= t && t <= r.r[1][1]))
-          .map(x => x.k))
-      .map((x, j) => new Set(x.filter(y => options[j].has(y))))
-}
+options = validTickets.reduce((options, ticket) =>
+  ticket
+    .map(t =>
+      ranges
+        .filter(r => (r.r[0][0] <= t && t <= r.r[0][1]) || (r.r[1][0] <= t && t <= r.r[1][1]))
+        .map(x => x.k))
+    .map((x, i) => new Set(x.filter(y => options[i].has(y)))),
+  validTickets[0].map(_ => new Set(ranges.map(x => x.k))))
 
 do {
   counts = ranges
