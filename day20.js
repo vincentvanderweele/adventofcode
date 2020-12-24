@@ -91,6 +91,6 @@ monsters = getAllOrientations(puzzle)
     }
     return count
   })
-  .filter(x => x)[0]
+  .find(x => x)
 
 puzzle.flatMap(x => x).filter(x => x === '#').length - monsters * monster.length
