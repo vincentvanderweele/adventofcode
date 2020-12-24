@@ -56,18 +56,18 @@ previous = corners[0]
 
 row = [previous]
 for (i = 1; i < 12; i++) {
-  previous = allBlocks.filter(({ h, l, t }) => edges.has(t) && l === previous.r && h !== previous.h)[0]
+  previous = find({ h, l, t }) => edges.has(t) && l === previous.r && h !== previous.h)
   row.push(previous)
 }
 
 rows = [row]
 previousRow = row
 for (j = 1; j < 12; j++) {
-  previous = allBlocks.filter(({ h, l, t }) => edges.has(l) && t === previousRow[0].b && h !== previousRow[0].h)[0]
+  previous = allBlocks.find(({ h, l, t }) => edges.has(l) && t === previousRow[0].b && h !== previousRow[0].h)
   row = [previous]
 
   for (i = 1; i < 12; i++) {
-    previous = allBlocks.filter(({ h, l, t }) => t === previousRow[i].b && l === previous.r && h !== previous.h)[0]
+    previous = allBlocks.find(({ h, l, t }) => t === previousRow[i].b && l === previous.r && h !== previous.h)
     row.push(previous)
   }
 
