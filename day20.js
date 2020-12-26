@@ -45,33 +45,26 @@ edges = new Set(
     .map(([k]) => k))
 
 corners = allBlocks
-  .filter(({ t, l }) => edges.has(t) && edges.has(l))
-  .filter((_, i) => i % 2)
+  .filter(({ t, l }) => edges.has(t) && edges.has(l) && t < l)
 
 // problem 1
 corners.reduce((p, { h }) => p * h, 1)
 
 // problem 2
-previous = corners[0]
-
-row = [previous]
-for (i = 1; i < 12; i++) {
-  previous = find({ h, l, t }) => edges.has(t) && l === previous.r && h !== previous.h)
-  row.push(previous)
-}
-
-rows = [row]
-previousRow = row
-for (j = 1; j < 12; j++) {
-  previous = allBlocks.find(({ h, l, t }) => edges.has(l) && t === previousRow[0].b && h !== previousRow[0].h)
+topEdges = edges
+topLeft = { b: corners[0].t, h: 9999 }
+rows = []
+for (i = 0; i < 12; i++) {
+  previous = allBlocks.find(({ h, l, t }) => edges.has(l) && t === topLeft.b && h !== topLeft.h)
+  topLeft = previous
   row = [previous]
 
-  for (i = 1; i < 12; i++) {
-    previous = allBlocks.find(({ h, l, t }) => t === previousRow[i].b && l === previous.r && h !== previous.h)
+  for (j = 1; j < 12; j++) {
+    previous = allBlocks.find(({ h, l, t }) => topEdges.has(t) && l === previous.r && h !== previous.h)
     row.push(previous)
   }
 
-  previousRow = row
+  topEdges = new Set(row.map(({ b }) => b))
   rows.push(row)
 }
 
@@ -80,17 +73,10 @@ puzzle = rows
   .flatMap(x => x.reduce((r, y) => r.map((z, i) => [...z, ...y[i]])))
 
 monsters = getAllOrientations(puzzle)
-  .map(p => {
-    count = 0
-    for (y = 0; y < puzzle.length - 3; y++) {
-      for (x = 0; x < puzzle[0].length - 20; x++) {
-        if (monster.every(m => puzzle[y + m.y][x + m.x] === '#')) {
-          count++
-        }
-      }
-    }
-    return count
-  })
+  .map(p =>
+    p.flatMap((r, x) => r.map((_, y) => ({ x, y }))
+      .map(({ x, y }) => monster.every(m => p[y + m.y] && p[y + m.y][x + m.x] === '#')))
+      .filter(x => x).length)
   .find(x => x)
 
 puzzle.flatMap(x => x).filter(x => x === '#').length - monsters * monster.length
