@@ -5,20 +5,15 @@ data=document
   .split('\n\n')
   .filter(x => x)
 
-inputBlocks = data
-  .map(x => {
-    [h, ...d] = x.split('\n')
-    return { h: parseInt(h.substring(5, 9)), d: d.map(y => y.split('')) }
-  })
-  
+inputBlocks = data.map(x => ({ h: parseInt(x.substring(5, 9)), d: x.split('\n').slice(1).map(y => y.split('')) }))
+
 monster = `                  # 
 #    ##    ##    ###
  #  #  #  #  #  #   `
   .split('\n')
-  .map(x => x.split('').map((c, x) => ({ c, x })))
-  .flatMap((r, y) => r.map(({c, x }) => ({ c, x, y })))
+  .flatMap((r, y) => r.split('').map((c, x) => ({ c, x, y })))
   .filter(({ c }) => c === '#')
-  .map(({x, y}) => ({ x, y}))
+  .map(({ x, y }) => ({ x, y }))
 
 transpose = b => b.reduce((r, x) => x.map((y, i) => [...(r[i] || []), y]), [])
 mirror = b => b.map(x => [...x].reverse())
@@ -33,26 +28,32 @@ allBlocks = inputBlocks
     r: d.map(x => x[d.length-1]).join(''),
   }))
 
+allBlocks = inputBlocks.flatMap(({ h, d }) => getAllOrientations(d).map(d => ({
+  h,
+  d,
+  t: d[0].join(''),
+  b: d[d.length-1].join(''),
+  l: d.map(x => x[0]).join(''),
+  r: d.map(x => x[d.length-1]).join(''),
+})))
+
 edgeCount = allBlocks
-  .reduce((c, { t, b, l, r }) => {
-    [t, b, l, r].forEach(x => { c[x] = (c[x] || 0) + 1 })
-    return c
-  }, {})
+  .flatMap(({ t, b, l, r }) => [t, b, l, r])
+  .reduce((c, x) => ({ ...c, [x]: (c[x] || 0) + 1 }), {})
 edges = new Set(
   Object
     .entries(edgeCount)
     .filter(([k, v]) => v === 4)
     .map(([k]) => k))
 
-corners = allBlocks
-  .filter(({ t, l }) => edges.has(t) && edges.has(l) && t < l)
+corners = allBlocks.filter(({ t, l }) => edges.has(t) && edges.has(l) && t < l)
 
 // problem 1
 corners.reduce((p, { h }) => p * h, 1)
 
 // problem 2
 topEdges = edges
-topLeft = { b: corners[0].t, h: 9999 }
+topLeft = { b: corners[0].t }
 rows = []
 for (i = 0; i < 12; i++) {
   previous = allBlocks.find(({ h, l, t }) => edges.has(l) && t === topLeft.b && h !== topLeft.h)
