@@ -19,15 +19,6 @@ transpose = b => b.reduce((r, x) => x.map((y, i) => [...(r[i] || []), y]), [])
 mirror = b => b.map(x => [...x].reverse())
 getAllOrientations = b => [...Array(4)].flatMap(_ => [transpose, mirror]).reduce((r, f) => [f(r[0] || b), ...r], []);
 
-allBlocks = inputBlocks
-  .flatMap(({ h, d }) => getAllOrientations(d).map(d => ({ h, d })))
-  .map(({ h, d }) => ({ h, d,
-    t: d[0].join(''),
-    b: d[d.length-1].join(''),
-    l: d.map(x => x[0]).join(''),
-    r: d.map(x => x[d.length-1]).join(''),
-  }))
-
 allBlocks = inputBlocks.flatMap(({ h, d }) => getAllOrientations(d).map(d => ({
   h,
   d,
