@@ -3,14 +3,14 @@ dots = new Set(parts[0].split('\n'));
 folds = parts[1]
   .split('\n')
   .filter((x) => x)
-  .map((x) => [...'xy'].map((c) => (c === x[11] ? x.slice(13) : 0)));
+  .map((x) => [...'xy'].map((c) => (c === x[11] ? x.slice(13) : 9999)));
 
 fold = (s, f) =>
   new Set(
     [...s].map((x) =>
       x
         .split(',')
-        .map((c, i) => (f[i] === 0 || parseInt(c) < f[i] ? c : 2 * f[i] - c))
+        .map((c, i) => (parseInt(c) < f[i] ? c : 2 * f[i] - c))
         .join(',')
     )
   );
