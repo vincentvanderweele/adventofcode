@@ -10,8 +10,7 @@ fold = (s, f) =>
     [...s].map((x) =>
       x
         .split(',')
-        .map((x) => parseInt(x))
-        .map((c, i) => (f[i] === 0 || c < f[i] ? c : 2 * f[i] - c))
+        .map((c, i) => (f[i] === 0 || parseInt(c) < f[i] ? c : 2 * f[i] - c))
         .join(',')
     )
   );
