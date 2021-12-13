@@ -3,10 +3,7 @@ dots = new Set(parts[0].split('\n'));
 folds = parts[1]
   .split('\n')
   .filter((x) => x)
-  .map((x) => {
-    value = parseInt(x.slice(13));
-    return x[11] === 'x' ? [value, 0] : [0, value];
-  });
+  .map((x) => [...'xy'].map((c) => (c === x[11] ? x.slice(13) : 0)));
 
 fold = (s, f) =>
   new Set(
