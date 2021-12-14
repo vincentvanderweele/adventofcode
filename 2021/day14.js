@@ -1,5 +1,5 @@
 parts = document.querySelector('pre').firstChild.textContent.split('\n\n');
-template = parts[0].split('');
+template = parts[0];
 // Already convert the rules to pair-rewrite rules, so AB -> C becomes AB -> [AC, BC].
 rules = parts[1]
   .split('\n')
@@ -18,9 +18,8 @@ solve = (steps) => {
       Object.entries(previousPairCounts)
         .flatMap(([p, n]) => rules[p].map((newPair) => [newPair, n]))
         .reduce(countFrequencies, {}),
-    template
-      .slice(1)
-      .map((c, i) => [`${template[i]}${c}`, 1])
+    [...Array(template.length - 1)]
+      .map((_, i) => [template.substring(i, i + 2), 1])
       .reduce(countFrequencies, {})
   );
 
