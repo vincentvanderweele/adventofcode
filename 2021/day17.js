@@ -11,14 +11,7 @@
   );
 
 // problem 1
-[...Array(-yMin)].reduce((max, _, vy0) => {
-  [vy, y, maxY] = [vy0, 0, 0];
-  while (y > yMax) {
-    y += vy--;
-    maxY = Math.max(y, maxY);
-  }
-  return y >= yMin && maxY > max ? maxY : max;
-}, 0);
+(yMin * (yMin + 1)) / 2;
 
 // problem 2
 reaches = (vx0, vy0) => {
