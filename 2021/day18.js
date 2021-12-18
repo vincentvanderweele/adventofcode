@@ -26,7 +26,8 @@ add = (...children) => {
   return self;
 };
 
-addTo = (n, i, x) => {
+// add x to first neighbor of n in direction i (0 = left, 1 = right)
+addToNeighbor = (n, i, x) => {
   let p = n;
   while (p.parent && p.parent.children[i] === p) p = p.parent;
   if (!p.parent) return;
@@ -64,7 +65,7 @@ explode = (n) => {
   toExplode = findAtDepth(n, 4);
   if (!toExplode) return false;
 
-  toExplode.children.forEach((c, i) => addTo(toExplode, i, c.value));
+  toExplode.children.forEach((c, i) => addToNeighbor(toExplode, i, c.value));
   replaceAtParent(toExplode, { value: 0 });
   return true;
 };
