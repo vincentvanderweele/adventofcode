@@ -83,26 +83,21 @@ constraints = inputs
   )
   .find(({ stack }) => stack.length === 0).constraints;
 
+// turn constraints of type `a[i] = a[j] + b[i] + c[j]` into a solution
+toSolution = (selectMostSignificantDigit) =>
+  constraints
+    .reduce(
+      (r, [high, low, diff]) => {
+        r[high] = selectMostSignificantDigit(diff);
+        r[low] = r[high] + diff;
+        return r;
+      },
+      [...Array(14)]
+    )
+    .join('');
+
 // problem 1
-constraints
-  .reduce(
-    (r, [high, low, diff]) => {
-      r[high] = 9 - Math.max(diff, 0);
-      r[low] = 9 + Math.min(diff, 0);
-      return r;
-    },
-    [...Array(14)]
-  )
-  .join('');
+toSolution((diff) => 9 - Math.max(diff, 0));
 
 // problem 2
-constraints
-  .reduce(
-    (r, [high, low, diff]) => {
-      r[high] = 1 - Math.min(diff, 0);
-      r[low] = 1 + Math.max(diff, 0);
-      return r;
-    },
-    [...Array(14)]
-  )
-  .join('');
+toSolution((diff) => 1 - Math.min(diff, 0));
