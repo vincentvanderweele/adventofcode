@@ -2,7 +2,8 @@
 //
 // Observation 1:
 // After each input read, the code block is more or less the same. The only difference
-// are 2 constants (which I'll call b and c lateron) and whether or not z is divided by 26.
+// are 2 constants (which I'll call b and c lateron) and whether or not z is divided by 26,
+// which I'll call push (not divided by 26) and pop (divided by 26) lateron.
 //
 // Observation 2:
 // The code block after each input block can be simplified to this:
@@ -27,14 +28,10 @@
 // if | c[j] + b[i] | >= 9, the if branch will always be executed.
 //
 // Observation 5:
-// The state space is actually really small. We can model the problem as a list of stacks of c[j]
-// choices.
-// - If z = z / 26 for this block, we pop the last element from each stack.
-// - If | c[j] + b[i] | >= 9, we don't have a choice at all and just push c[i] to the stack.
-// - If | c[j] + b[i] | < 9, we can choose whether to match a[i] and a[j] or not, so the stack splits in two
-//   - push c[i] to the stack and mark the constraint a[i] - a[j] !== c[j] + b[i]
-//   - don't push anything and mark the constraint a[i] - a[j] === c[j] + b[i]
-// A valid state is one that ends with an empty stack.
+// c[i] > 0 for all i and b[i] >= 10 for all i where we push. So we don't even have to do any math,
+// we just need to make sure that a[i] === a[j] + c[j] + b[i] holds for all i where we pop.
+// We can do this by pushing (i, c[i]) pairs to a stack on push and adding (i, j, b[i], c[j])
+// constraints to a list on pop.
 
 input = document.querySelector('pre').firstChild.textContent;
 
@@ -57,43 +54,27 @@ add y (-?\\d+)
 mul y x
 add z y`;
 
-inputs = [...input.matchAll(new RegExp(block, 'g'))]
+constraints = [...input.matchAll(new RegExp(block, 'g'))]
   .map((m) => m.slice(1).map((x) => parseInt(x)))
-  .map(([pop, b, c]) => ({ pop: pop === 26, b, c }));
-
-constraints = inputs
+  .map(([push, b, c]) => ({ push: push === 1, b, c }))
   .reduce(
-    (stacks, { pop, b, c }, index) =>
-      stacks.flatMap(({ stack, constraints }) => {
-        if (!stack.length) return { stack: [{ index, c }], constraints: [] };
+    ({ stack, constraints }, { push, b, c }, i) => ({
+      constraints: push
+        ? constraints
+        : [...constraints, { ...stack.pop(), low: i, b }],
+      stack: push ? [...stack, { high: i, c }] : stack,
+    }),
+    { stack: [], constraints: [] }
+  ).constraints;
 
-        let { index: lastIndex, c: lastC } = stack[stack.length - 1];
-        if (pop) stack.pop();
-
-        result = [{ stack: [...stack, { index, c }], constraints }];
-        if (Math.abs(b + lastC) < 9) {
-          result.push({
-            stack,
-            constraints: [...constraints, [lastIndex, index, b + lastC]],
-          });
-        }
-        return result;
-      }),
-    [{ stack: [], constraints: [] }]
-  )
-  .find(({ stack }) => stack.length === 0).constraints;
-
-// turn constraints of type `a[i] = a[j] + b[i] + c[j]` into a solution
+// turn constraints of type `a[low] = a[high] + b[low] + c[high]` into a solution
 toSolution = (selectMostSignificantDigit) =>
   constraints
-    .reduce(
-      (r, [high, low, diff]) => {
-        r[high] = selectMostSignificantDigit(diff);
-        r[low] = r[high] + diff;
-        return r;
-      },
-      [...Array(14)]
-    )
+    .reduce((r, { high, low, b, c }) => {
+      r[high] = selectMostSignificantDigit(b + c);
+      r[low] = r[high] + b + c;
+      return r;
+    }, Array(14))
     .join('');
 
 // problem 1
