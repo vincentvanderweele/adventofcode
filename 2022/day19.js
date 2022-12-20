@@ -51,11 +51,13 @@ maxGeodes = (time, resources, producers, costs) => {
 
 solve = (costs, n) => {
   max = 0;
-  // It never pays off to generate more ore than what's
+  // It never pays off to generate more resources than what's
   // needed for the most expensive purchase.
-  maxOreCost = Math.max(...costs.map(([ore]) => ore));
+  maxCosts = [...Array(costs.length)].map((_, i) =>
+    Math.max(...costs.map(cost => cost[i]))
+  );
 
-  solveInternal = (time, resources, producers, costs) => {
+  solveInternal = (time, resources, producers) => {
     if (time === 0) return resources[3];
 
     // Cut this branch because it cannot be optimal
@@ -65,9 +67,12 @@ solve = (costs, n) => {
     // For each buy, figure out after many rounds we can afford it.
     const roundsToBuy = costs
       .map((cost, producer) => ({ cost, producer }))
-      // Don't buy more ore producers if we already produce at max rate
-      .filter(({ producer }) => producer !== 0 || producers[0] < maxOreCost)
-      // Filter our buys for which we're not producing the required resources
+      // Don't buy more producers if we already produce at max rate
+      .filter(
+        ({ producer }) =>
+          maxCosts[producer] === 0 || producers[producer] < maxCosts[producer]
+      )
+      // Filter out buys for which we're not producing the required resources
       .filter(({ cost }) => cost.every((x, i) => x === 0 || producers[i] > 0))
       // How many rounds does it take before we can afford this
       .map(({ cost, producer }) => ({
@@ -102,7 +107,7 @@ solve = (costs, n) => {
     return result;
   };
 
-  return solveInternal(n, [0, 0, 0, 0], [1, 0, 0, 0], costs);
+  return solveInternal(n, [0, 0, 0, 0], [1, 0, 0, 0]);
 };
 
 // problem 1

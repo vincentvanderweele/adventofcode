@@ -24,34 +24,40 @@ blocks = [
   },
 ];
 
-// I tried with a circular array but couldn't make it work.
-// In the end it turned out I needed nothing like that...
+// This grid uses bitmasks to represent each row and only keeps the
+// last 100 rows in active memory. The block size is there to limit
+// data allocation.
+// It turned out none of that is necessary...
 newGrid = () => {
+  const blockSize = 100000;
+
   const grid = {
-    data: [],
+    data: Array(blockSize + 100),
     height: 0,
-  };
+    offset: 0,
+    addBlock: (block, x, y) => {
+      grid.height = Math.max(grid.height, y + block.rows.length - 1);
 
-  grid.addBlock = (block, x, y) => {
-    grid.height = Math.max(grid.height, y + block.rows.length - 1);
+      for (let i = 0; i < block.rows[i]; i++)
+        grid.data[y + i - grid.offset] |= block.rows[i] >> x;
 
-    for (let i = 0; i < block.rows[i]; i++) {
-      if (y + i > grid.height) {
-        grid.data.push(block.rows[i] >> x);
-      } else {
-        grid.data[y + i] |= block.rows[i] >> x;
+      if (grid.height - grid.offset > blockSize + 90) {
+        grid.data = grid.data.slice(blockSize).concat(Array(blockSize));
+        grid.offset += blockSize;
       }
-    }
+    },
+    isOccupied: (block, x, y) =>
+      y <= grid.height &&
+      block.rows.some((row, i) => grid.data[y + i - grid.offset] & (row >> x)),
   };
-
-  grid.isOccupied = (block, x, y) =>
-    y <= grid.height &&
-    block.rows.some((row, i) => grid.data[y + i] & (row >> x));
 
   return grid;
 };
 
-// None of these optimizations are necessary but they are fast :D
+// There are always 4 horizontal moves and 3 vertical moves before reaching
+// the top of the tower. So make those 4 horizontal moves in one go and
+// simply start 3 rows lower.
+// It turned out this optimization was not necessary at all.
 getX = (i, width) => {
   const segment = doubleMoves.slice(i, i + 4);
 
@@ -119,10 +125,18 @@ solve(2022);
 // problem 2
 // I derived these values by adding logging to the solve method.
 // Not interested in writing an algorithm to compute them...
+
+// First round for which `grid.data[grid.height] === 0x11111110`
 round0 = 377;
+
+// Difference between first and second round for which
+// `grid.data[grid.height] === 0x11111110` and the values
+// for `block` and `i` are the same.
 dRound = 1715;
-height0 = 577;
+
+// Difference in height between `round0` and `round0 + dRound`
 dHeight = 2616;
+
 N = 1000000000000;
 Math.floor((N - round0) / dRound) * dHeight +
   solve(round0 + ((N - round0) % dRound));
