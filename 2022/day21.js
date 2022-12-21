@@ -39,6 +39,7 @@ results.humn = { value: 0, xValue: 1 };
 compute = (operator, [{ value: l }, { value: r }]) => eval(`l ${operator} r`);
 computeX = (operator, [{ value: l, xValue: lx }, { value: r, xValue: rx }]) => {
   if (!lx && !rx) return 0;
+  if (lx && rx) throw new Error('This is tricky');
 
   switch (operator) {
     case '+':
@@ -73,4 +74,4 @@ results.root.value + results.root.xValue * rules.humn.value;
 
 // problem 2
 [left, right] = rules.root.dependencies.map(x => results[x]);
-Math.round((right.value - left.value) / left.xValue);
+Math.round((right.value - left.value) / (left.xValue - right.xValue));
