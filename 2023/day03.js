@@ -13,6 +13,7 @@ data = [
 numbers = [...Array(10)].map((_, i) => i).join('');
 numbersAndDot = [...numbers, '.'];
 
+// { x, y, n } objects of numbers found
 numbersAndPositions = data.flatMap(
   (line, y) =>
     line.split('').reduce(
@@ -31,12 +32,13 @@ numbersAndPositions = data.flatMap(
     ).result
 );
 
+// { n, c, x, y } objects of character c at (x, y) touching number n
 numbersAndSymbols = numbersAndPositions.map(({ n, x, y }) =>
   [...Array(`${n}`.length + 2)]
     .flatMap((_, i) =>
-      [...Array(3)].map((_, j) => ({ i: i + x - 1, j: j + y - 1 }))
+      [...Array(3)].map((_, j) => ({ x: i + x - 1, y: j + y - 1 }))
     )
-    .map(({ i, j }) => ({ n, i, j, c: data[j].charAt(i) }))
+    .map(({ x, y }) => ({ n, x, y, c: data[y].charAt(x) }))
     .find(({ c }) => !numbersAndDot.includes(c))
 );
 
@@ -48,9 +50,9 @@ b = Object.values(
   numbersAndSymbols
     .filter(x => x?.c === '*')
     .reduce(
-      (r, { n, i, j }) => ({
+      (r, { n, x, y }) => ({
         ...r,
-        [`${i},${j}`]: [...(r[`${i},${j}`] ?? []), n],
+        [`${x},${y}`]: [...(r[`${x},${y}`] ?? []), n],
       }),
       {}
     )
