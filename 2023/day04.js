@@ -23,15 +23,11 @@ a = wins
 // problem 2
 b = wins
   .reduce(
-    (counts, wins, i) => {
-      fixed = counts.slice(0, i + 1);
-      increase = counts.slice(i + 1, i + wins + 1);
-      rest = counts.slice(i + wins + 1);
-
-      current = fixed[fixed.length - 1];
-
-      return [...fixed, ...increase.map(x => x + current), ...rest];
-    },
+    (counts, wins, i) => [
+      ...counts.slice(0, i + 1),
+      ...counts.slice(i + 1, i + wins + 1).map(x => x + counts[i]),
+      ...counts.slice(i + wins + 1),
+    ],
     [...Array(wins.length)].map(() => 1)
   )
   .reduce((s, x) => s + x);
