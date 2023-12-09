@@ -27,12 +27,12 @@ intervals = Object.keys(steps)
     return i;
   });
 
-gcm = (x, y) => {
-  if (x < y) return gcm(y, x);
+gcd = (x, y) => {
+  if (x < y) return gcd(y, x);
   if (y === 0) return x;
-  return gcm(y, x % y);
+  return gcd(y, x % y);
 };
 
-b = intervals.reduce((p, i) => (p * i) / gcm(p, i));
+b = intervals.reduce((p, i) => (p * i) / gcd(p, i));
 
 [a, b];
