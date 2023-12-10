@@ -85,7 +85,7 @@ b = map
     crosses = 0;
     count = 0;
     for (x = 0; x < row.length; x++) {
-      if (lookup[`${x},${y}`]) crosses += edges[map[y][x]];
+      if (inPath[`${x},${y}`]) crosses += edges[map[y][x]];
       else if (Math.abs(crosses % 2) === 1) count++;
     }
     return count;
