@@ -29,22 +29,12 @@ a = solve(
 
 // problem 2
 b = solve(({ i, j }) => {
-  mas = 'MAS';
-  if (data[i][j] !== mas[1]) return 0;
+  if (data[i][j] !== 'A') return 0;
 
-  return [
-    [
-      [-1, -1],
-      [1, 1],
-    ],
-    [
-      [-1, 1],
-      [1, -1],
-    ],
-  ].every(
-    dir =>
-      dir
-        .map(([di, dj]) => mas.indexOf(getLetter(i + di, j + dj)) - 1)
+  return [1, -1].every(
+    dj =>
+      [-1, 1]
+        .map(k => 'MAS'.indexOf(getLetter(i + k, j + k * dj)) - 1)
         .reduce((p, x) => p * x) === -1
   )
     ? 1
