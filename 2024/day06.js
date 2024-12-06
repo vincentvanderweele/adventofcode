@@ -33,7 +33,7 @@ while (isInMap(guard)) {
     guard = next;
   }
 }
-a = isInPath.length;
+a = isInPath.size;
 
 // problem 2
 b = map
