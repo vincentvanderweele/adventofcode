@@ -8,39 +8,37 @@ eqs = document
     numbers: n.split(' ').map(x => parseInt(x, 10)),
   }));
 
-solve =
-  useConcat =>
-  ({ target, numbers }) => {
-    const cache = {};
-    const r = (n = numbers, c = 0) => {
-      if (n.length === 0) return target === c;
+solve = useConcat =>
+  eqs
+    .filter(({ target, numbers }) => {
+      r = (t = target, i = numbers.length - 1) => {
+        if (i === 0) {
+          return t === numbers[0];
+        }
 
-      const key = `${n.join(',')},${c}`;
-      if (cache[key] !== undefined) return cache[key];
+        let result = r(t - numbers[i], i - 1);
+        if (t % numbers[i] === 0) {
+          result ||= r(t / numbers[i], i - 1);
+        }
+        if (useConcat) {
+          const base = Math.pow(10, Math.ceil(Math.log10(numbers[i] + 1)));
+          if (t % base === numbers[i]) {
+            result ||= r(Math.floor(t / base), i - 1);
+          }
+        }
 
-      const [n0, ...rest] = n;
+        return result;
+      };
 
-      const result =
-        r(rest, c + n0) ||
-        r(rest, c * n0) ||
-        (useConcat && c > 0 && r([parseInt(`${c}${n0}`, 10), ...rest], 0));
-
-      cache[key] = result;
-      return result;
-    };
-    return r();
-  };
+      return r();
+    })
+    .map(x => x.target)
+    .reduce((s, x) => s + x);
 
 // Problem 1
-a = eqs
-  .filter(solve(false))
-  .map(x => x.target)
-  .reduce((s, x) => s + x);
+a = solve(false);
 
 // Problem 2
-b = eqs
-  .filter(solve(true))
-  .map(x => x.target)
-  .reduce((s, x) => s + x);
+b = solve(true);
 
 [a, b];
