@@ -10,28 +10,26 @@ eqs = document
 
 solve = useConcat =>
   eqs
-    .filter(({ target, numbers }) => {
-      r = (t = target, i = numbers.length - 1) => {
-        if (i === 0) {
-          return t === numbers[0];
-        }
+    .filter(({ target, numbers }) =>
+      [...numbers].reverse().reduce(
+        (targets, x, i) =>
+          i === numbers.length - 1
+            ? targets.includes(x)
+            : targets.flatMap(t => {
+                const results = [];
 
-        let result = r(t - numbers[i], i - 1);
-        if (t % numbers[i] === 0) {
-          result ||= r(t / numbers[i], i - 1);
-        }
-        if (useConcat) {
-          const base = Math.pow(10, Math.ceil(Math.log10(numbers[i] + 1)));
-          if (t % base === numbers[i]) {
-            result ||= r(Math.floor(t / base), i - 1);
-          }
-        }
+                results.push(t - x);
+                if (t % x === 0) results.push(t / x);
+                if (useConcat) {
+                  const base = Math.pow(10, Math.ceil(Math.log10(x + 1)));
+                  if (t % base === x) results.push(Math.floor(t / base));
+                }
 
-        return result;
-      };
-
-      return r();
-    })
+                return results;
+              }),
+        [target]
+      )
+    )
     .map(x => x.target)
     .reduce((s, x) => s + x);
 
