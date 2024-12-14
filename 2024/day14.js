@@ -1,4 +1,4 @@
-input = document
+robots = document
   .querySelector('pre')
   .firstChild.data.split('\n')
   .filter(x => x)
@@ -14,7 +14,7 @@ input = document
 (n = 101), (m = 103);
 
 // Problem 1
-a = input
+a = robots
   .map(([[px, py], [vx, vy]]) => [
     (((px + 100 * vx) % n) + n) % n,
     (((py + 100 * vy + m) % m) + m) % m,
@@ -31,33 +31,25 @@ a = input
   .reduce((p, x) => p * x);
 
 // Problem 2
-horizontalClusters = map =>
-  map.reduce((r, row) => {
-    const rowMax = row.reduce(
-      ({ current, max }, c) =>
-        c === 'X'
-          ? { current: current + 1, max }
-          : { current: 0, max: Math.max(current, max) },
-      { current: 0, max: 0 }
-    ).max;
+symmetry = robots => {
+  const s = new Set(robots.map(([[x, y]]) => `${x},${y}`));
 
-    return r + (rowMax > 2 ? rowMax : 0);
-  }, 0);
+  return robots.filter(([[x, y]]) => x < n / 2 && s.has(`${n - 1 - x},${y}`))
+    .length;
+};
+
+max = 0;
 
 for (let i = 1; i < n * m; i++) {
-  const map = [...Array(m)].map(() => Array(n).fill('.'));
-
-  for (const robot of input) {
-    robot[0][0] = (robot[0][0] + robot[1][0] + n) % n;
-    robot[0][1] = (robot[0][1] + robot[1][1] + m) % m;
-
-    map[robot[0][1]][robot[0][0]] = 'X';
+  for (const robot of robots) {
+    const [[px, py], [vx, vy]] = robot;
+    robot[0] = [(px + vx + n) % n, (py + vy + m) % m];
   }
 
-  const clusters = horizontalClusters(map);
-  if (clusters > 250) {
+  const s = symmetry(robots);
+  if (s > max) {
     b = i;
-    break;
+    max = s;
   }
 }
 
