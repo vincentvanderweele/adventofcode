@@ -16,8 +16,8 @@ robots = document
 // Problem 1
 a = robots
   .map(([[px, py], [vx, vy]]) => [
-    (((px + 100 * vx) % n) + n) % n,
-    (((py + 100 * vy + m) % m) + m) % m,
+    (px + 100 * (vx + n)) % n,
+    (py + 100 * (vy + m)) % m,
   ])
   .reduce(
     (r, p) => {
@@ -31,25 +31,23 @@ a = robots
   .reduce((p, x) => p * x);
 
 // Problem 2
-symmetry = robots => {
-  const s = new Set(robots.map(([[x, y]]) => `${x},${y}`));
-
-  return robots.filter(([[x, y]]) => x < n / 2 && s.has(`${n - 1 - x},${y}`))
-    .length;
-};
-
 max = 0;
 
 for (let i = 1; i < n * m; i++) {
-  for (const robot of robots) {
-    const [[px, py], [vx, vy]] = robot;
-    robot[0] = [(px + vx + n) % n, (py + vy + m) % m];
+  const s = new Set();
+  let count = 0;
+
+  for (const [[px, py], [vx, vy]] of robots) {
+    const x = (px + i * (vx + n)) % n;
+    const y = (py + i * (vy + m)) % m;
+
+    if (s.has(`${n - 1 - x},${y}`)) count++;
+    s.add(`${x},${y}`);
   }
 
-  const s = symmetry(robots);
-  if (s > max) {
+  if (count > max) {
     b = i;
-    max = s;
+    max = count;
   }
 }
 
