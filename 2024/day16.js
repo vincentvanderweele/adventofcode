@@ -63,15 +63,12 @@ neighbors = ([i, j, r, s, f]) => [
 ];
 
 // Problem 1
-a = 0;
-while (!a) {
+while (maps.every(map => map[end[0]][end[1]] < 0)) {
   do {
     [i, j, r, s, f] = queue.min();
   } while (maps[r][i][j] >= 0);
 
   maps[r][i][j] = s;
-
-  if (i === end[0] && j === end[1]) a = s;
 
   const ns = neighbors([i, j, r, s, f]).filter(
     ([i, j, r]) => maps[r][i][j] < 0
@@ -79,6 +76,7 @@ while (!a) {
 
   for (const n of ns) queue.add(n);
 }
+a = Math.max(...maps.map(map => map[end[0]][end[1]]));
 
 // Problem 2
 bestPath = new Set();
