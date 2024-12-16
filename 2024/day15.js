@@ -131,17 +131,10 @@ for (const move of moves) {
     const [di, dj] = dirs[move];
     const [ni, nj] = [bi + di, bj + dj];
 
-    if (move === '>') {
-      m2[ni][nj + 1] = ']';
-      m2[bi][bj + 1] = '.';
-      m2[ni][nj] = '[';
-      m2[bi][bj] = '.';
-    } else {
-      m2[ni][nj] = '[';
-      m2[bi][bj] = '.';
-      m2[ni][nj + 1] = ']';
-      m2[bi][bj + 1] = '.';
-    }
+    m2[bi][bj] = '.';
+    m2[bi][bj + 1] = '.';
+    m2[ni][nj] = '[';
+    m2[ni][nj + 1] = ']';
   }
 }
 
