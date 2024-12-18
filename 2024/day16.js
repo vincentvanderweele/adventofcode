@@ -36,6 +36,7 @@ heap = comp => {
       moveUp();
     },
     min: () => {
+      if (queue.length <= 1) return queue.pop();
       [result, queue[0]] = [queue[0], queue.pop()];
       moveDown();
       return result;
