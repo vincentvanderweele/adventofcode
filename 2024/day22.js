@@ -4,45 +4,35 @@ secrets = document
   .filter(x => x)
   .map(x => parseInt(x, 10));
 
-ops = [x => x << 6, x => x >> 5, x => x << 11];
+a = 0;
+b = 0;
+counts = {};
+
 base = 16777216;
 
-round = x => ops.reduce((r, f) => (((f(r) ^ r) % base) + base) % base, x);
+for (let s of secrets) {
+  const seen = new Set();
+  let prev = 0;
+  let key = 0;
 
-solve = secret => {
-  bananas = {};
+  for (let i = 0; i < 2000; i++) {
+    s = [x => x << 6, x => x >> 5, x => x << 11].reduce(
+      (r, f) => (((f(r) ^ r) % base) + base) % base,
+      s
+    );
 
-  prev = 0;
-  diffs = [];
-  for (i = 0; i < 2000; i++) {
-    secret = round(secret);
+    const curr = s % 10;
 
-    curr = secret % 10;
-    diffs = [...diffs.slice(-3), curr - prev];
-
-    if (i >= 4) bananas[diffs.join(',')] ??= curr;
-
+    key = ((key << 5) & 0xfffff) | (9 + curr - prev);
     prev = curr;
+
+    if (i >= 4 && !seen.has(key)) {
+      seen.add(key);
+      b = Math.max(b, (counts[key] = (counts[key] ?? 0) + curr));
+    }
   }
 
-  return { secret, bananas };
-};
-
-solutions = secrets.map(solve);
-
-// Problem 1
-a = solutions.map(x => x.secret).reduce((s, x) => s + x);
-
-// Problem 2
-b = Math.max(
-  ...Object.values(
-    solutions
-      .map(x => x.bananas)
-      .reduce((r, x) => {
-        for (let [k, v] of Object.entries(x)) r[k] = v + (r[k] ?? 0);
-        return r;
-      })
-  )
-);
+  a += s;
+}
 
 [a, b];
