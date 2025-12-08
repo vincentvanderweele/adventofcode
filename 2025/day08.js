@@ -14,22 +14,26 @@ neighbors = input
   )
   .sort((a, b) => a.d - b.d);
 
-sets = input.map((_, i) => new Set([i]));
+circuits = input.map((_, i) => new Set([i]));
 
 ni = 0;
 
 while (true) {
   last = neighbors[ni++];
 
-  if (sets[last.s] !== sets[last.e]) {
-    s = sets[last.s].union(sets[last.e]);
-    if (s.size === input.length) break;
-    for (x of s) sets[x] = s;
+  if (circuits[last.s] !== circuits[last.e]) {
+    circuit = circuits[last.s].union(circuits[last.e]);
+    if (circuit.size === input.length) break;
+    for (x of circuit) circuits[x] = circuit;
   }
 
   if (ni === 1000) {
-    sorted = [...sets].map(x => x.size).sort((a, b) => b - a);
-    a = sorted[0] * sorted[sorted[0]] * sorted[sorted[0] + sorted[sorted[0]]];
+    a = Object.values(
+      Object.fromEntries(circuits.map(([h, ...r]) => [h, r.length + 1]))
+    )
+      .sort((a, b) => b - a)
+      .slice(0, 3)
+      .reduce((p, x) => p * x);
   }
 }
 
