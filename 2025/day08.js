@@ -18,12 +18,11 @@ circuits = input.map((_, i) => new Set([i]));
 
 ni = 0;
 
-while (true) {
+while (circuits[0].size < input.length) {
   last = neighbors[ni++];
 
   if (circuits[last.s] !== circuits[last.e]) {
     circuit = circuits[last.s].union(circuits[last.e]);
-    if (circuit.size === input.length) break;
     for (x of circuit) circuits[x] = circuit;
   }
 
