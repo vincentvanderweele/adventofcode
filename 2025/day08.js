@@ -27,9 +27,8 @@ while (circuits[0].size < input.length) {
   }
 
   if (ni === 1000) {
-    a = Object.values(
-      Object.fromEntries(circuits.map(([h, ...r]) => [h, r.length + 1]))
-    )
+    a = [...new Set(circuits)]
+      .map(x => x.size)
       .sort((a, b) => b - a)
       .slice(0, 3)
       .reduce((p, x) => p * x);
