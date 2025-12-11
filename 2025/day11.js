@@ -14,15 +14,14 @@ memo = f => {
 };
 
 solve = memo((from, count = 0) => {
-  if (from === 'fft' || from === 'dac') count++;
+  if (from === 'fft' || from === 'dac') count--;
 
-  if (from === 'out') return [1, count === 2 ? 1 : 0];
-  return input[from]
-    .map(to => solve(to, count))
-    .reduce((s, x) => s.map((s, i) => s + x[i]));
+  if (from === 'out') return count > 0 ? 0 : 1;
+
+  return input[from].map(to => solve(to, count)).reduce((s, x) => s + x);
 });
 
-a = solve('you')[0];
-b = solve('svr')[1];
+a = solve('you');
+b = solve('svr', 2);
 
 [a, b];
